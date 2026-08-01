@@ -43,6 +43,28 @@ received" and closes on "answer located". Lines mentioning declines or
 failure render in the wound colour. The sigil spins up while `body` carries
 `.thinking`, then the answer types out in the serif.
 
+## The frame
+
+*The King in Yellow* (Chambers, 1895): a text that spreads, that people
+pass on, that nobody can adequately explain the pull of. Suppressing it
+fails. Reading it is always voluntary, and that is the trap.
+
+The site is built on that shape. It wants to be asked and it wants to be
+carried, and **the reason is never given, on any page, ever.** That refusal
+is the whole effect. Anything that explains the wanting kills it.
+
+Chambers is public domain, but nothing here quotes him. The register is
+borrowed; the words are original. Keep it that way.
+
+- The sigil is the Sign. Once a visitor has asked, `#seen` states that they
+  have seen it and it cannot be returned, then never mentions it again.
+- `HUNGER` lines surface after the second question and escalate.
+- At `MARK_AT` (7 asks) the visitor is "marked": `body.marked` brightens
+  the sigil core to the sign yellow, and the hunger starts pointing at the
+  propagation page.
+- The yellow is jaundiced, not gold. `--ember` for structure, `--sign` for
+  the moments that are supposed to land.
+
 ## Every page has to do something
 
 The three secondary pages were originally static text and read as dead next
@@ -59,6 +81,26 @@ one too:
 - **Canary** verifies its own signature (mismatched key, valid signature,
   both stable) and counts down live to the first of the month, when
   revision 10 publishes with nobody assigned to publish it.
+- **Propagation** documents how it spreads and refuses to say why. The
+  "Copy it" button is the only thing the site ever asks of anyone. It
+  tries the async clipboard, falls back to `execCommand`, and if both
+  refuse it prints the URL to copy by hand, so the button is never dead.
+
+## Local preview, and the blank-page trap
+
+These are plain static files with no build step, but the pages still need
+to be **served over http**, and every link is relative. If the local server
+is not running, the first page can look fine while every nav click comes up
+blank, because the browser is requesting a port with nothing behind it.
+
+If pages go blank, check the server before suspecting the site:
+
+```bash
+curl -s -o /dev/null -w '%{http_code}\n' http://localhost:8097/archive.html
+```
+
+`000` means no server. Start one from the project directory and leave it
+up for the whole session.
 
 ## No explanatory copy
 

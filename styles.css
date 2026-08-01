@@ -6,7 +6,9 @@
   --ash:   #cbc5b9;
   --dim:   #6d6961;
   --faint: #35332e;
-  --ember: #c8912e;
+  /* The yellow is the point. Tattered, jaundiced, not gold. */
+  --ember: #d0a52f;
+  --sign:  #e8d15a;
   --blood: #8d2020;
   --mono: ui-monospace, "SF Mono", "Cascadia Code", "JetBrains Mono",
           Menlo, Consolas, "Liberation Mono", monospace;
@@ -425,6 +427,91 @@ body.thinking .sigil .core   { animation-duration: 0.7s; }
   color: var(--ember);
   letter-spacing: 0.08em;
   margin: 8px 0 4px 0;
+}
+
+/* ---------- the sign ---------- */
+
+.seen {
+  display: none;
+  text-align: center;
+  font-size: 11px;
+  letter-spacing: 0.2em;
+  color: #5e5a4a;
+  margin-top: 20px;
+  line-height: 2;
+  animation: surface 2.2s ease both;
+}
+
+.seen.on { display: block; }
+.seen b { color: var(--sign); font-weight: normal; }
+
+body.marked .sigil .core circle:last-child { fill: var(--sign); }
+body.marked .sigil .ring-a { stroke-opacity: 0.7; }
+
+/* ---------- hunger ---------- */
+
+.hunger {
+  display: none;
+  margin-top: 30px;
+  padding-top: 22px;
+  border-top: 1px solid var(--faint);
+  font-size: 12.5px;
+  line-height: 1.9;
+  color: #6a6656;
+  font-style: italic;
+}
+
+.hunger.on { display: block; animation: surface 1.6s ease both; }
+.hunger b { color: var(--sign); font-weight: normal; font-style: normal; }
+
+/* ---------- propagation ---------- */
+
+.spread-num {
+  font-size: clamp(30px, 6vw, 52px);
+  color: var(--sign);
+  letter-spacing: 0.04em;
+  line-height: 1.1;
+  margin-bottom: 4px;
+}
+
+.spread-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+  gap: 1px;
+  background: var(--faint);
+  border: 1px solid var(--faint);
+  margin: 22px 0;
+}
+
+.spread-grid div { background: var(--void); padding: 20px 18px; }
+.spread-grid .k {
+  font-size: 9px;
+  letter-spacing: 0.26em;
+  text-transform: uppercase;
+  color: #4e4c46;
+  margin-bottom: 8px;
+}
+.spread-grid .v { font-size: 21px; color: var(--ember); }
+.spread-grid .n { font-size: 11px; color: #4e4c46; margin-top: 7px; line-height: 1.6; }
+
+#carry-out {
+  margin-top: 18px;
+  font-size: 11.5px;
+  letter-spacing: 0.12em;
+  color: #5e5a4a;
+  min-height: 20px;
+}
+
+#carry-out b { color: var(--sign); font-weight: normal; }
+
+.verse {
+  font-family: var(--serif);
+  font-size: 17px;
+  line-height: 1.9;
+  color: #b8b09c;
+  border-left: 1px solid rgba(232, 209, 90, 0.3);
+  padding: 4px 0 4px 24px;
+  margin: 26px 0;
 }
 
 /* ---------- archive entries ---------- */

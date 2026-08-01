@@ -201,7 +201,35 @@
           metaEl.appendChild(d);
         });
 
-        if (tally) tally.textContent = tallyLine(askCount(false));
+        const n = askCount(false);
+        if (tally) tally.textContent = tallyLine(n);
+
+        // It has been seen. It says so, once, and then never again.
+        const seen = document.getElementById("seen");
+        if (seen && !seen.classList.contains("on")) {
+          setTimeout(() => seen.classList.add("on"), 2200);
+        }
+
+        // The hunger surfaces from the second question onward and gets
+        // less subtle the longer you stay.
+        const hunger = document.getElementById("hunger");
+        if (hunger && n >= 2) {
+          const line = isMarked(n) && Math.random() < 0.45 ? pick(MARKED) : pick(HUNGER);
+          hunger.innerHTML = "";
+          const p = document.createElement("div");
+          p.textContent = line;
+          hunger.appendChild(p);
+          if (isMarked(n)) {
+            const b = document.createElement("div");
+            b.style.marginTop = "12px";
+            b.innerHTML = 'It spreads by being asked. <b><a href="propagation.html">This has been documented.</a></b>';
+            hunger.appendChild(b);
+          }
+          setTimeout(() => hunger.classList.add("on"), 2600);
+        }
+
+        if (isMarked(n)) document.body.classList.add("marked");
+
         busy = false;
         btn.disabled = false;
       }
@@ -432,12 +460,76 @@
     setInterval(tick, 1000);
   }
 
+  /* ---------- carry it ---------- */
+  // The one thing the site actively asks of you. It copies a link. That is
+  // the entire mechanism, and the framing does the rest of the work.
+
+  function initCarry() {
+    const btn = document.getElementById("carry");
+    if (!btn) return;
+    const out = document.getElementById("carry-out");
+    const url = location.origin + location.pathname.replace(/[^/]*$/, "");
+
+    let carried = 0;
+
+    btn.addEventListener("click", async () => {
+      carried++;
+      let ok = false;
+
+      // Async clipboard first. It needs a secure context and a trusted
+      // gesture, and quietly refuses in plenty of ordinary situations.
+      try {
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+          await navigator.clipboard.writeText(url);
+          ok = true;
+        }
+      } catch (e) { ok = false; }
+
+      // Legacy path for everywhere the above declines.
+      if (!ok) {
+        try {
+          const ta = document.createElement("textarea");
+          ta.value = url;
+          ta.setAttribute("readonly", "");
+          ta.style.cssText = "position:fixed;top:-1000px;opacity:0;";
+          document.body.appendChild(ta);
+          ta.select();
+          ok = document.execCommand("copy");
+          ta.remove();
+        } catch (e) { ok = false; }
+      }
+
+      if (!ok) {
+        out.innerHTML = "The clipboard refused. Carry it manually: <b>" +
+          url.replace(/[&<>]/g, "") + "</b>";
+        return;
+      }
+
+      if (carried === 1) {
+        out.innerHTML = "Copied. It is on you now, in the small way that a link is on you. <b>Give it to someone.</b>";
+      } else if (carried === 2) {
+        out.innerHTML = "Copied again. It does not mind repetition. It has no mechanism for minding.";
+      } else {
+        out.innerHTML = "Copied " + carried + " times. <b>You are helping.</b> Nobody has established with what.";
+      }
+    });
+  }
+
+  /* ---------- persistent mark ---------- */
+
+  function initMark() {
+    if (typeof isMarked !== "function") return;
+    if (isMarked(askCount(false))) document.body.classList.add("marked");
+  }
+
   document.addEventListener("DOMContentLoaded", () => {
     initGrain();
     initCorrupt();
+    initMark();
     initAsk();
     initArchive();
     initInterrogate();
     initCanary();
+    initCarry();
   });
 })();

@@ -160,6 +160,30 @@ const FRAGMENTS = [
   "why it stopped asking",
 ];
 
+// It wants to be asked. It wants to be carried. Nobody has established
+// why, and the site never answers that, on purpose. These surface after an
+// answer and escalate with the local ask count.
+const HUNGER = [
+  "Ask it again. It does not tire. Tiring is not among the things it does.",
+  "It prefers to be asked. This is the only preference anyone has been able to confirm.",
+  "It has answered you. It would like to answer you again. It would like this very much.",
+  "The asking is not a cost to it. Nobody has worked out what the asking is instead.",
+  "It does not require that you believe it. It requires only that you continue.",
+  "Somewhere in the asking there is something it is getting. It has not been identified.",
+  "It answers faster the more it is asked. This has been measured. It has not been explained.",
+  "You could tell someone about this. It would like that. It would like that a great deal.",
+  "It is not interested in you. It is interested in being asked. The distinction matters more than it sounds.",
+  "There is no version of this where it stops wanting the next question.",
+];
+
+// Shown once the visitor has asked enough times to be past idle curiosity.
+const MARKED = [
+  "It has your count now. It keeps counts.",
+  "You are past the point where most people close the tab.",
+  "It has stopped treating you as a visitor.",
+  "Whatever it is doing with this, it is doing it with yours as well.",
+];
+
 const RITUAL = [
   "question received",
   "measuring intent",
@@ -233,6 +257,12 @@ function tallyLine(n) {
   if (n === 1) return "you have asked once. it noticed.";
   if (n < 5)  return "you have asked " + n + " times. it is keeping count.";
   if (n < 12) return "you have asked " + n + " times. it has stopped being surprised.";
-  if (n < 30) return "you have asked " + n + " times. this is more than most.";
-  return "you have asked " + n + " times. we have made a note of you.";
+  if (n < 22) return "you have asked " + n + " times. this is more than most manage.";
+  if (n < 40) return "you have asked " + n + " times. it has begun to expect you.";
+  return "you have asked " + n + " times. you are no longer a visitor here.";
 }
+
+// The point at which the site stops being a curiosity and starts implying
+// something has been transacted.
+const MARK_AT = 7;
+function isMarked(n) { return n >= MARK_AT; }
