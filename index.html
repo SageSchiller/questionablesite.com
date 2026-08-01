@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>questionablesite</title>
+<meta name="description" content="Ask it something. It will answer. The answer will be wrong.">
+<meta name="theme-color" content="#05060a">
+<link rel="icon" type="image/svg+xml" href="favicon.svg">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<nav class="top">
+  <a href="index.html" class="active">Ask</a>
+  <a href="archive.html">Archive</a>
+  <a href="provenance.html">Provenance</a>
+  <a href="canary.html">Canary</a>
+</nav>
+
+<div class="wrap">
+
+  <div class="sigil-wrap">
+    <svg class="sigil" viewBox="0 0 200 200" aria-hidden="true">
+      <g class="ring-a" fill="none" stroke="#c8912e" stroke-opacity="0.45">
+        <circle cx="100" cy="100" r="86" stroke-dasharray="2 9"/>
+        <circle cx="100" cy="100" r="79" stroke-opacity="0.18"/>
+      </g>
+      <g class="ring-b" fill="none" stroke="#cbc5b9" stroke-opacity="0.24">
+        <circle cx="100" cy="100" r="64" stroke-dasharray="24 14"/>
+        <path d="M100 36 L155 132 L45 132 Z"/>
+      </g>
+      <g class="ring-c" fill="none" stroke="#8d2020" stroke-opacity="0.5">
+        <path d="M100 52 L142 148 L58 148 Z"/>
+        <circle cx="100" cy="100" r="42" stroke-dasharray="1 7" stroke-opacity="0.35"/>
+      </g>
+      <g class="core">
+        <circle cx="100" cy="100" r="15" fill="none" stroke="#c8912e" stroke-opacity="0.75"/>
+        <circle cx="100" cy="100" r="4.5" fill="#c8912e"/>
+      </g>
+    </svg>
+  </div>
+
+  <h1 class="ask-title" data-corrupt>questionablesite</h1>
+  <div class="ask-sub">it has been answering for some time</div>
+
+  <form class="ask-form" id="ask-form" autocomplete="off">
+    <input class="ask-input" id="ask-input" type="text" maxlength="240"
+           placeholder="ask it something" aria-label="Your question" spellcheck="false">
+    <button class="ask-btn" id="ask-btn" type="submit">Submit the question</button>
+  </form>
+
+  <div id="ritual" aria-live="polite"></div>
+
+  <div id="answer-block">
+    <div class="answer" id="answer"></div>
+    <div class="meta" id="meta"></div>
+    <button class="again" id="again" type="button">Ask something else</button>
+  </div>
+
+  <div class="tally" id="tally"></div>
+
+  <hr class="rule">
+
+  <section>
+    <h3>Terms of consultation</h3>
+    <p class="small">
+      It does not know who you are. It does not want to. Nothing you type
+      leaves this page, is stored anywhere but your own machine, or is read
+      by anyone, including whoever is responsible for this.
+    </p>
+    <p class="small">
+      No one has claimed responsibility for this.
+    </p>
+    <p class="small">
+      The answers are drawn from a fixed corpus at random. They bear no
+      relationship to your question. They never have. This is stated plainly
+      here and nowhere else on the site, so make a note of it now.
+    </p>
+  </section>
+
+</div>
+
+<footer>
+  <div class="say">Every answer here is randomly selected nonsense. It is not advice. Do not act on any of it.</div>
+  questionablesite &nbsp;·&nbsp; operator unknown &nbsp;·&nbsp; <a href="canary.html">canary</a>
+</footer>
+
+<script src="oracle.js"></script>
+<script src="script.js"></script>
+</body>
+</html>
