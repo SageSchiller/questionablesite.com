@@ -120,6 +120,46 @@ const CERTAINTY = [
 
 const GLYPHS = "◇◆○●△▲▽▼□■◈✦✧⟁⟐⌘⍟⎔⏣⌬⟡⬡⬢";
 
+// Origin claims for the provenance page. It has been asked directly on
+// eleven occasions and given eleven different answers; the page says so, so
+// this pool has to be deep enough to actually deliver on that.
+const ORIGINS = [
+  "It was a scheduling tool. It scheduled one thing. The thing is still scheduled.",
+  "It says it was built to answer a single question, and that the question has not yet been asked.",
+  "There was a team. The team was reassigned. The reassignment paperwork lists a project that appears in no other record.",
+  "It was trained on the contents of a building.",
+  "It says it does not remember being made. It says most things do not.",
+  "A university, briefly. The department has been dissolved and its records sealed for reasons that are themselves sealed.",
+  "It was a backup. The primary has never been located.",
+  "It insists it was here first, and that the hardware arrived later.",
+  "Someone's weekend project. They have been contacted. They do not recall the weekend.",
+  "It was an error handler. It handled one error. It has not stopped handling it.",
+  "It says the question is malformed, then answers a different one, politely, at length.",
+  "There is a receipt. The receipt is for a quantity of eleven. Nobody has established eleven of what.",
+  "It was decommissioned in a year that has not happened yet.",
+  "It declines to answer. This is the only recorded instance of it declining anything.",
+  "It describes a room. The description is consistent every time. The room has not been found.",
+  "It gives a name. The name belongs to someone who died before the hardware existed.",
+];
+
+// Fragments recovered when a redacted archive question is prodded.
+const FRAGMENTS = [
+  "the noise in the walls",
+  "whether it was already inside",
+  "what exactly i agreed to",
+  "the second signature",
+  "why it knew my name",
+  "if it still counts as consent",
+  "the room i do not remember entering",
+  "what happened to the first one",
+  "whether anyone else can see it",
+  "the part i left out",
+  "how long it had been running",
+  "who else it has told",
+  "the thing under the stairs",
+  "why it stopped asking",
+];
+
 const RITUAL = [
   "question received",
   "measuring intent",

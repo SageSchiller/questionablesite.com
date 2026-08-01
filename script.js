@@ -218,17 +218,15 @@
   // Fabricated on load from the same corpus, so the page is never twice the
   // same and always looks like it has been running without us.
 
-  function initArchive() {
-    const feed = document.getElementById("feed");
-    if (!feed) return;
+  const ASKED = [
+    "should i", "is it too late to", "was it my fault that", "how do i tell them",
+    "what happens if i", "why does it keep", "am i the only one who",
+    "is there a way to", "how long until", "did i imagine", "should i have said",
+    "what do i do about", "can it still be", "is it normal that",
+  ];
 
-    const asked = [
-      "should i", "is it too late to", "was it my fault that", "how do i tell them",
-      "what happens if i", "why does it keep", "am i the only one who",
-      "is there a way to", "how long until", "did i imagine", "should i have said",
-      "what do i do about", "can it still be", "is it normal that",
-    ];
-
+  function renderArchive(feed) {
+    feed.innerHTML = "";
     for (let i = 0; i < 14; i++) {
       const r = makeReading();
       const e = document.createElement("div");
@@ -236,10 +234,28 @@
 
       const q = document.createElement("div");
       q.className = "q";
-      q.textContent = "> " + pick(asked) + " ";
+      q.textContent = "> " + pick(ASKED) + " ";
+
+      // The redaction gives way if you push at it. What is underneath is
+      // worse than the block was.
       const red = document.createElement("span");
       red.className = "redact";
+      red.setAttribute("role", "button");
+      red.setAttribute("tabindex", "0");
+      red.title = "recover";
       red.textContent = "█".repeat(6 + Math.floor(Math.random() * 22));
+      const reveal = () => {
+        if (red.classList.contains("open")) return;
+        red.classList.add("open");
+        red.textContent = pick(FRAGMENTS);
+        red.removeAttribute("role");
+        red.removeAttribute("tabindex");
+        red.title = "";
+      };
+      red.addEventListener("click", reveal);
+      red.addEventListener("keydown", (ev) => {
+        if (ev.key === "Enter" || ev.key === " ") { ev.preventDefault(); reveal(); }
+      });
       q.appendChild(red);
 
       const a = document.createElement("div");
@@ -256,10 +272,172 @@
     }
   }
 
+  function initArchive() {
+    const feed = document.getElementById("feed");
+    if (!feed) return;
+    renderArchive(feed);
+
+    const btn = document.getElementById("redraw");
+    const note = document.getElementById("redraw-note");
+    if (!btn) return;
+
+    let draws = 0;
+    btn.addEventListener("click", () => {
+      draws++;
+      feed.style.opacity = "0";
+      setTimeout(() => {
+        renderArchive(feed);
+        feed.style.opacity = "1";
+        if (note) {
+          if (draws === 1) note.textContent = "fourteen different entries. the archive has not changed.";
+          else if (draws < 4) note.textContent = "fourteen again. it is always fourteen.";
+          else if (draws < 8) note.textContent = "you are looking for the fifteenth. there is no fifteenth.";
+          else note.textContent = "you have drawn " + draws + " times. it is drawing too.";
+        }
+      }, reduced ? 0 : 320);
+    });
+  }
+
+  /* ---------- provenance: interrogate it about itself ---------- */
+  // The page claims it has been asked directly eleven times and gave eleven
+  // different answers. The button has to actually deliver that, so origins
+  // are drawn without replacement until the pool is exhausted.
+
+  function initInterrogate() {
+    const btn = document.getElementById("interrogate");
+    if (!btn) return;
+    const out = document.getElementById("interrogate-out");
+    const count = document.getElementById("interrogate-count");
+
+    let pool = ORIGINS.slice();
+    let asked = 0;
+    let busy = false;
+
+    btn.addEventListener("click", () => {
+      if (busy) return;
+      busy = true;
+      asked++;
+      btn.disabled = true;
+      document.body.classList.add("thinking");
+
+      out.innerHTML = "";
+      const thinking = document.createElement("div");
+      thinking.className = "dim";
+      thinking.textContent = "  putting the question to it";
+      out.appendChild(thinking);
+
+      let dots = 0;
+      const tick = setInterval(() => {
+        dots = (dots + 1) % 4;
+        thinking.textContent = "  putting the question to it" + ".".repeat(dots);
+      }, 260);
+
+      setTimeout(() => {
+        clearInterval(tick);
+        document.body.classList.remove("thinking");
+        out.innerHTML = "";
+
+        if (!pool.length) pool = ORIGINS.slice();
+        const idx = Math.floor(Math.random() * pool.length);
+        const claim = pool.splice(idx, 1)[0];
+
+        const line = document.createElement("div");
+        line.className = "claim";
+        line.textContent = claim;
+        out.appendChild(line);
+
+        const stamp = document.createElement("div");
+        stamp.className = "foot";
+        stamp.textContent = `response ${asked}  ·  ${pick(CERTAINTY)[0]}  ·  ${glyphRun(3)}`;
+        out.appendChild(stamp);
+
+        if (count) {
+          if (asked < 11) {
+            count.textContent = `asked ${asked} time${asked === 1 ? "" : "s"}. ${asked} different answer${asked === 1 ? "" : "s"}. none of them contradict each other.`;
+          } else if (asked === 11) {
+            count.textContent = "eleven. this is where the record stops. the record was written before you got here.";
+          } else {
+            count.textContent = `asked ${asked} times. you are past the record now. it has not repeated itself.`;
+          }
+        }
+
+        busy = false;
+        btn.disabled = false;
+      }, reduced ? 0 : 1500);
+    });
+  }
+
+  /* ---------- canary: verify the signature, and the countdown ---------- */
+
+  function initCanary() {
+    const btn = document.getElementById("verify");
+    const out = document.getElementById("verify-out");
+
+    if (btn && out) {
+      const LINES = [
+        ['loading signature block .............. ', 'ok', 'ok'],
+        ['loading public key from revision 1 ... ', 'ok', 'ok'],
+        ['computing digest ..................... ', 'ok', 'ok'],
+        ['comparing ............................ ', 'MISMATCH', 'no'],
+        ['retrying with revision 1 key ......... ', 'MISMATCH', 'no'],
+        ['retrying with current key ............ ', 'no current key published', 'no'],
+        ['verifying anyway ..................... ', 'VALID', 'em'],
+      ];
+
+      btn.addEventListener("click", () => {
+        btn.disabled = true;
+        out.innerHTML = "";
+        let i = 0;
+        const step = () => {
+          if (i >= LINES.length) {
+            const concl = document.createElement("div");
+            concl.style.marginTop = "14px";
+            concl.innerHTML =
+              '<span class="ok">The signature is valid. The key does not match.</span>\n' +
+              '<span class="t">Both results are stable across repeated verification.</span>';
+            out.appendChild(concl);
+            btn.disabled = false;
+            return;
+          }
+          const [label, val, cls] = LINES[i];
+          const row = document.createElement("div");
+          const a = document.createElement("span");
+          a.textContent = label;
+          const b = document.createElement("span");
+          b.className = cls;
+          b.textContent = val;
+          row.appendChild(a); row.appendChild(b);
+          out.appendChild(row);
+          i++;
+          setTimeout(step, reduced ? 0 : 260 + Math.random() * 260);
+        };
+        step();
+      });
+    }
+
+    // Countdown to the first of the next month, when revision 10 is due.
+    const clock = document.getElementById("countdown");
+    if (!clock) return;
+    const tick = () => {
+      const now = new Date();
+      const next = new Date(now.getFullYear(), now.getMonth() + 1, 1, 0, 0, 0);
+      let s = Math.max(0, Math.floor((next - now) / 1000));
+      const d = Math.floor(s / 86400); s -= d * 86400;
+      const h = Math.floor(s / 3600);  s -= h * 3600;
+      const m = Math.floor(s / 60);    s -= m * 60;
+      const p = (n) => String(n).padStart(2, "0");
+      clock.textContent = `${d}d ${p(h)}:${p(m)}:${p(s)}`;
+    };
+    tick();
+    setInterval(tick, 1000);
+  }
+
   document.addEventListener("DOMContentLoaded", () => {
     initGrain();
     initCorrupt();
     initAsk();
     initArchive();
+    initInterrogate();
+    initCanary();
   });
 })();

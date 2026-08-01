@@ -43,6 +43,35 @@ received" and closes on "answer located". Lines mentioning declines or
 failure render in the wound colour. The sigil spins up while `body` carries
 `.thinking`, then the answer types out in the serif.
 
+## Every page has to do something
+
+The three secondary pages were originally static text and read as dead next
+to the oracle. Each one now has a working mechanism, and any new page needs
+one too:
+
+- **Archive** regenerates fourteen entries from the corpus on load and on
+  demand. The redactions are clickable and recover a fragment underneath.
+  The redraw note escalates the more you push it.
+- **Provenance** lets you interrogate it about its own origin. Claims are
+  drawn **without replacement** from `ORIGINS`, because the page states it
+  gave eleven different answers on eleven occasions and the button has to
+  actually deliver that rather than repeating after three.
+- **Canary** verifies its own signature (mismatched key, valid signature,
+  both stable) and counts down live to the first of the month, when
+  revision 10 publishes with nobody assigned to publish it.
+
+## No explanatory copy
+
+There was a "Terms of consultation" block on the homepage explaining the
+mechanism in plain language. It has been removed: it broke character on the
+one page that most needs to hold it. The homepage is now sigil, title,
+input, tally, nothing else.
+
+The single footer line is the entire disclaimer and it stays (see below).
+Resist adding explanation anywhere else. The provenance page is where
+questions about the site get answered, and it answers them by deepening
+them.
+
 ## Design notes
 
 - Mono for the interface, serif for the answers. The contrast is the whole
@@ -63,6 +92,9 @@ Questions never leave the page. They are never sent anywhere, never stored,
 and never even echoed into the DOM: the answer is drawn from the corpus and
 the question is discarded. `localStorage` holds one integer, the local ask
 tally, which drives the escalating line under the form.
+
+This used to be spelled out on the homepage and no longer is. It remains
+true; it is documented here instead of on the site.
 
 ## The footer disclaimer
 

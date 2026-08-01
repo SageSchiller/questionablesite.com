@@ -332,7 +332,100 @@ body.thinking .sigil .core   { animation-duration: 0.7s; }
   border-radius: 1px;
 }
 
-.redact:hover { color: #2a2823; }
+.redact[role="button"] { cursor: pointer; transition: background 0.3s; }
+.redact[role="button"]:hover { background: #262420; }
+.redact[role="button"]:focus-visible { outline: 1px solid var(--ember); }
+
+.redact.open {
+  background: none;
+  color: var(--blood);
+  user-select: auto;
+  animation: recover 0.7s ease both;
+}
+
+@keyframes recover {
+  from { opacity: 0; filter: blur(4px); }
+  to   { opacity: 1; filter: none; }
+}
+
+/* ---------- shared action button ---------- */
+
+.act {
+  background: none;
+  border: 1px solid var(--faint);
+  color: var(--dim);
+  font-family: var(--mono);
+  font-size: 10.5px;
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  padding: 13px 24px;
+  cursor: pointer;
+  transition: color 0.35s, border-color 0.35s, letter-spacing 0.5s, background 0.35s;
+}
+
+.act:hover:not(:disabled) {
+  color: var(--ember);
+  border-color: rgba(200, 145, 46, 0.45);
+  letter-spacing: 0.38em;
+  background: rgba(200, 145, 46, 0.03);
+}
+
+.act:disabled { color: var(--faint); cursor: default; }
+
+#feed { transition: opacity 0.3s ease; }
+
+/* ---------- interrogation ---------- */
+
+#interrogate-out { margin-top: 22px; min-height: 42px; }
+
+#interrogate-out .claim {
+  font-family: var(--serif);
+  font-size: clamp(17px, 2.5vw, 22px);
+  line-height: 1.6;
+  color: #ece6da;
+  border-left: 1px solid rgba(200, 145, 46, 0.42);
+  padding: 4px 0 4px 22px;
+  animation: surface 1.1s ease both;
+}
+
+#interrogate-out .foot {
+  margin-top: 12px;
+  padding-left: 23px;
+  font-size: 10px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: #46443f;
+}
+
+#interrogate-count, #redraw-note {
+  margin-top: 18px;
+  font-size: 11px;
+  letter-spacing: 0.12em;
+  color: #4e4c46;
+}
+
+/* ---------- canary verify ---------- */
+
+#verify-out {
+  margin-top: 20px;
+  font-size: 12px;
+  line-height: 1.95;
+  white-space: pre-wrap;
+  color: var(--dim);
+  min-height: 20px;
+}
+
+#verify-out .ok { color: var(--ash); }
+#verify-out .no { color: var(--blood); }
+#verify-out .em { color: var(--ember); }
+#verify-out .t  { color: #46443f; }
+
+.countdown {
+  font-size: clamp(22px, 4vw, 34px);
+  color: var(--ember);
+  letter-spacing: 0.08em;
+  margin: 8px 0 4px 0;
+}
 
 /* ---------- archive entries ---------- */
 
