@@ -22,24 +22,7 @@
 <div class="wrap">
 
   <div class="sigil-wrap">
-    <svg class="sigil" viewBox="0 0 200 200" aria-hidden="true">
-      <g class="ring-a" fill="none" stroke="#c8912e" stroke-opacity="0.45">
-        <circle cx="100" cy="100" r="86" stroke-dasharray="2 9"/>
-        <circle cx="100" cy="100" r="79" stroke-opacity="0.18"/>
-      </g>
-      <g class="ring-b" fill="none" stroke="#cbc5b9" stroke-opacity="0.24">
-        <circle cx="100" cy="100" r="64" stroke-dasharray="24 14"/>
-        <path d="M100 36 L155 132 L45 132 Z"/>
-      </g>
-      <g class="ring-c" fill="none" stroke="#8d2020" stroke-opacity="0.5">
-        <path d="M100 52 L142 148 L58 148 Z"/>
-        <circle cx="100" cy="100" r="42" stroke-dasharray="1 7" stroke-opacity="0.35"/>
-      </g>
-      <g class="core">
-        <circle cx="100" cy="100" r="15" fill="none" stroke="#c8912e" stroke-opacity="0.75"/>
-        <circle cx="100" cy="100" r="4.5" fill="#c8912e"/>
-      </g>
-    </svg>
+    <canvas id="sign" class="sigil" width="220" height="220" aria-hidden="true"></canvas>
   </div>
 
   <h1 class="ask-title" data-corrupt>questionablesite</h1>
@@ -63,7 +46,7 @@
   <div class="tally" id="tally"></div>
 
   <div class="seen" id="seen">
-    You have seen the sign now. <b>It cannot be returned.</b><br>
+    You have seen the site now. <b>It cannot be returned.</b><br>
     This is not a threat. Nothing happens to you. It is simply no longer
     the case that you have not seen it.
   </div>
@@ -71,11 +54,12 @@
 </div>
 
 <footer>
-  <div class="say">Every answer here is randomly selected nonsense. It is not advice. Do not act on any of it.</div>
+  <div class="say">It has never been right. Not once, not by accident, not even by the odds. Whatever it gives you, leave it here.</div>
   questionablesite &nbsp;·&nbsp; operator unknown &nbsp;·&nbsp; <a href="canary.html">canary</a>
 </footer>
 
 <script src="oracle.js"></script>
 <script src="script.js"></script>
+<script src="sign.js"></script>
 </body>
 </html>

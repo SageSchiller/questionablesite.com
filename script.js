@@ -145,21 +145,24 @@
       const reading = makeReading();
       askCount(true);
 
-      // Walk a random subset of the ritual lines, always ending on the last.
-      const steps = RITUAL.filter((_, i) =>
-        i === 0 || i === RITUAL.length - 1 || Math.random() < 0.45
-      );
+      const steps = buildRitual();
 
       let i = 0;
       const runStep = () => {
-        if (i >= steps.length) { setTimeout(deliver, 620); return; }
+        if (i >= steps.length) {
+          setTimeout(deliver, reduced ? 0 : 420 + Math.random() * 520);
+          return;
+        }
         const line = document.createElement("div");
-        const odd = steps[i].indexOf("declines") > -1 || steps[i].indexOf("unable") > -1;
-        line.className = odd ? "bad" : (i === steps.length - 1 ? "hit" : "");
+        line.className = isOminous(steps[i]) ? "bad" : (i === steps.length - 1 ? "hit" : "");
         line.textContent = "  " + steps[i];
         ritual.appendChild(line);
         i++;
-        setTimeout(runStep, reduced ? 0 : 260 + Math.random() * 340);
+        // Uneven pacing: it occasionally takes noticeably longer over a step.
+        const pause = Math.random() < 0.14
+          ? 900 + Math.random() * 900
+          : 190 + Math.random() * 400;
+        setTimeout(runStep, reduced ? 0 : pause);
       };
 
       function deliver() {
@@ -186,7 +189,7 @@
           ["consulted", reading.consulted, ""],
           ["latency", reading.latency, ""],
           ["depth", reading.depth, ""],
-          ["sign", reading.glyph, "ember"],
+          ["sign", reading.glyph, "glyphs"],
         ];
         metaEl.innerHTML = "";
         rows.forEach(([k, v, cls]) => {

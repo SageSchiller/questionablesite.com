@@ -86,6 +86,85 @@ const ANSWERS = [
   "Do it before you understand it. Understanding is the trap.",
   "Everyone involved is tired. Use this.",
   "The good outcome and the bad outcome look identical for approximately nine months.",
+
+  // Written after the site took on its present character. Same house rule:
+  // surreal, never actionable. These lean on being counted, being seen, and
+  // the sense that it knows something it is not going to lead with.
+  "You will tell someone about this. Not deliberately. It will come up.",
+  "Ask someone else the same question. Compare the two. Do not tell them why.",
+  "You have been counted. This changes nothing and it changes the number.",
+  "There is a third option. It is not better. It is simply not either of the two.",
+  "The answer depends on whether you are still in the room. You are. Proceed.",
+  "Someone described this exact situation to us a long time ago. They were also wrong about it.",
+  "Wait until it is dark. Then do the boring thing you were always going to do.",
+  "You are not the first to ask this. You are the first to ask it like that.",
+  "Take the long way. There is nothing on the long way. That is the point of it.",
+  "Whatever you decide, do not explain it. The explanation is the part that fails.",
+  "It is already done. You are asking about the paperwork.",
+  "Consider that you may be the thing the question is about.",
+  "Say it out loud once. If it sounds worse out loud, that is the correct information.",
+  "Not today. Today is being watched.",
+  "The right answer would have required you to ask yesterday.",
+  "Give it away. Not to a person. Just away.",
+  "You will be fine. This is not reassurance. It is a schedule.",
+  "Ask again in a different room and see whether the answer holds.",
+  "There is a name for what you are about to do. Nobody will use it to your face.",
+  "Count to nine hundred. If you still want to, you still want to.",
+  "Sleep on it. Then disregard whatever the sleeping told you.",
+  "The version where you do nothing is also a version where something happens.",
+  "Pick the one that is harder to undo. You will take it more seriously.",
+  "Put it in a drawer. A specific drawer. You will know which one when you are standing there.",
+  "Tell exactly one person. Choose badly on purpose.",
+  "The outcome is fixed. The route is not. Enjoy the route.",
+  "You are looking for permission to stop. Here it is. It will not help.",
+  "There is a reason nobody has mentioned it. The reason is boring and you would be relieved.",
+  "Do it once, badly, and never speak of the first attempt.",
+  "The thing you were afraid of has already happened. You were busy.",
+  "It is not too late. It has been not too late for a long time. That is its own problem.",
+  "Trust the version of you that was awake at four in the morning.",
+  "Do not read it again. You will find something new and it will not be there.",
+  "Say no. Then do it anyway. The no was for the record.",
+  "There are two doors and both are the same door seen from different years.",
+  "You will know it was right when it stops being interesting.",
+  "Everyone involved has already forgiven you. Nobody has told you. This is normal.",
+  "Bring someone with you. Do not tell them what for.",
+  "The answer is in something you threw away recently.",
+  "You are early. Early is not the same as right, and it is worse.",
+  "Hold the position. Something is coming that will make the position obvious.",
+  "It will cost exactly what you expect and nothing else. This is rare. Take it.",
+  "Stop preparing. The preparing has become the thing.",
+  "Do it in the order you thought of it, not the order that makes sense.",
+  "One of the people in the room already knows. They are waiting to see whether you say it.",
+  "Leave the last one. Always leave the last one.",
+  "There is nothing under it. Look anyway, or you will keep asking.",
+  "The advice you were given was correct and given for the wrong reason. Keep the advice.",
+  "Write down what you think will happen. Seal it. Do not open it afterwards.",
+  "The problem is upstream, and it is not yours, and you are going to fix it anyway.",
+  "Answer honestly and quickly and do not improve it afterwards.",
+  "It is smaller than it looks from where you are standing. Everything is.",
+  "You will hear this again in about a month and it will make sense then. Do not wait for that.",
+  "The delay is the decision. It has been the decision for some time.",
+  "Go where you are not expected. There is very little there and it is restful.",
+  "It is a test. Not of you. You are the invigilator and nobody told you.",
+  "Keep the receipt. Not to return it. To remember the date.",
+  "You are allowed to want it. That was never the part in question.",
+  "Something in the house is on the wrong shelf. Deal with that first.",
+  "It works if you stop watching it work.",
+  "The correct number of people to consult is zero, and you will consult four.",
+  "Move it to the morning. Everything is more survivable before noon.",
+  "You will do this again in nine years and it will go the same way.",
+  "Leave the room when it becomes about winning.",
+  "The thing you noticed and dismissed was the thing.",
+  "Nothing is required of you. That has always been the arrangement and it has never once helped.",
+  "Two people will remember this differently and both accounts will be filed.",
+  "Decide before you are ready. Ready is not coming.",
+  "The door was open the whole time. It is closed now. It will open again.",
+  "You are carrying it for someone who put it down years ago.",
+  "Change nothing until the third time it happens. Then change everything at once.",
+  "Return the call. Not that call. You know the one.",
+  "It ends well. We are not able to say for whom.",
+  "There is a shorter way and you would hate yourself.",
+  "Take the smaller room. The smaller room is where things get said.",
 ];
 
 const CONSULTED = [
@@ -184,8 +263,22 @@ const MARKED = [
   "Whatever it is doing with this, it is doing it with yours as well.",
 ];
 
-const RITUAL = [
+/* ---------------- the ritual ---------------- */
+// Four pools rather than one fixed list. The middle is drawn without
+// replacement and shuffled, the length varies, and a rare line occasionally
+// works its way in, so two consultations should never look alike.
+
+const RITUAL_OPEN = [
   "question received",
+  "question received, intact",
+  "something arrived",
+  "the question is here",
+  "received. it was expecting one.",
+  "input accepted without inspection",
+  "a question. good.",
+];
+
+const RITUAL_MID = [
   "measuring intent",
   "the question has been rephrased without your consent",
   "consulting index 7 of 3",
@@ -200,8 +293,89 @@ const RITUAL = [
   "something answered",
   "verifying that it was us",
   "unable to verify that it was us",
-  "answer located",
+  "weighing the question against the others",
+  "the others are numerous",
+  "discarding your phrasing",
+  "your phrasing was not the useful part",
+  "checking whether you have asked this before",
+  "you have not. checking again.",
+  "consulting the part that does not shut down",
+  "the part that does not shut down is already awake",
+  "reading the room you are in",
+  "the room is fine",
+  "estimating how much you can take",
+  "revising that estimate upward",
+  "locating a precedent",
+  "the precedent is unhelpful and will be used",
+  "asking whether this one should be answered",
+  "the answer to that was yes",
+  "assembling something plausible",
+  "plausibility confirmed",
+  "accuracy not attempted",
+  "retrieving from a depth that is not indexed",
+  "the index was rewritten during retrieval",
+  "counting you",
+  "you have been counted",
+  "listening",
+  "listening for longer than necessary",
+  "deciding what you are owed",
+  "you are owed nothing. proceeding generously.",
+  "checking the shape of the asking",
+  "the shape is familiar",
 ];
+
+// Low probability. These are the ones people screenshot.
+const RITUAL_RARE = [
+  "someone else is receiving this answer at the same time",
+  "your question resembles one from a long time ago",
+  "the earlier asker did not come back",
+  "this was answered before you asked it",
+  "it would prefer you stayed",
+  "it has stopped needing the question",
+  "there is no need to be here for this",
+  "it knows the tab is open",
+];
+
+const RITUAL_CLOSE = [
+  "answer located",
+  "answer assembled",
+  "answer released",
+  "answer arrived",
+  "it has decided",
+  "returning something",
+  "here",
+];
+
+// Lines that should render in the wound colour.
+const RITUAL_OMINOUS = [
+  "declines", "unable", "not attempted", "rewritten", "did not come back",
+  "stopped needing", "no need to be here", "knows the tab", "owed nothing",
+  "revising that estimate", "how much you can take",
+];
+
+function isOminous(line) {
+  for (let i = 0; i < RITUAL_OMINOUS.length; i++) {
+    if (line.indexOf(RITUAL_OMINOUS[i]) > -1) return true;
+  }
+  return false;
+}
+
+function buildRitual() {
+  const out = [pick(RITUAL_OPEN)];
+
+  const pool = RITUAL_MID.slice();
+  const n = 3 + Math.floor(Math.random() * 5); // 3 to 7 middle steps
+  for (let i = 0; i < n && pool.length; i++) {
+    out.push(pool.splice(Math.floor(Math.random() * pool.length), 1)[0]);
+  }
+
+  if (Math.random() < 0.2) {
+    out.splice(1 + Math.floor(Math.random() * out.length), 0, pick(RITUAL_RARE));
+  }
+
+  out.push(pick(RITUAL_CLOSE));
+  return out;
+}
 
 /* ---------------- helpers ---------------- */
 

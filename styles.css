@@ -118,27 +118,20 @@ hr.rule {
 
 /* ---------- sigil ---------- */
 
-.sigil-wrap { display: flex; justify-content: center; margin: 26px 0 8px 0; }
+.sigil-wrap { display: flex; justify-content: center; margin: 22px 0 6px 0; }
 
-.sigil { width: 190px; height: 190px; overflow: visible; }
-
-.sigil * { transform-origin: 100px 100px; }
-
-.sigil .ring-a { animation: spin 92s linear infinite; }
-.sigil .ring-b { animation: spin 61s linear infinite reverse; }
-.sigil .ring-c { animation: spin 148s linear infinite; }
-.sigil .core   { animation: pulse 5.5s ease-in-out infinite; }
-
-body.thinking .sigil .ring-a { animation-duration: 3.6s; }
-body.thinking .sigil .ring-b { animation-duration: 2.4s; }
-body.thinking .sigil .ring-c { animation-duration: 6s; }
-body.thinking .sigil .core   { animation-duration: 0.7s; }
-
-@keyframes spin  { to { transform: rotate(360deg); } }
-@keyframes pulse {
-  0%, 100% { opacity: 0.30; }
-  50%      { opacity: 0.95; }
+/* The Sign is a canvas: see sign.js. It drives its own motion, reads
+   body.thinking and body.marked itself, and needs no CSS animation. */
+.sigil {
+  width: 220px;
+  height: 220px;
+  display: block;
+  filter: drop-shadow(0 0 22px rgba(208, 165, 47, 0.10));
+  transition: filter 1.2s ease;
 }
+
+body.thinking .sigil { filter: drop-shadow(0 0 34px rgba(232, 209, 90, 0.26)); }
+body.marked   .sigil { filter: drop-shadow(0 0 28px rgba(232, 209, 90, 0.20)); }
 
 /* ---------- the ask ---------- */
 
@@ -255,15 +248,24 @@ body.thinking .sigil .core   { animation-duration: 0.7s; }
 
 @keyframes blink { 50% { opacity: 0; } }
 
+/* Gridlines come from each cell's own outline rather than a parent
+   background showing through the gaps. With an odd item count the last row
+   is ragged, and a parent background would render that leftover track as a
+   grey slab. */
 .meta {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(158px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(132px, 1fr));
   gap: 1px;
-  background: var(--faint);
-  border: 1px solid var(--faint);
 }
 
-.meta div { background: var(--void); padding: 13px 15px; }
+/* Direct children only: the label and value divs live inside each cell and
+   must not pick up their own outline. */
+.meta > div {
+  background: var(--void);
+  box-shadow: 0 0 0 1px var(--faint);
+  padding: 13px 15px;
+}
+
 .meta .k {
   font-size: 9px;
   letter-spacing: 0.26em;
@@ -274,6 +276,16 @@ body.thinking .sigil .core   { animation-duration: 0.7s; }
 .meta .v { font-size: 12.5px; color: var(--ash); }
 .meta .v.ember { color: var(--ember); }
 .meta .v.blood { color: var(--blood); }
+
+/* The sign is the one piece of the readout that should be legible across
+   the room. */
+.meta .v.glyphs {
+  font-size: 23px;
+  line-height: 1.15;
+  letter-spacing: 0.14em;
+  color: var(--sign);
+  text-shadow: 0 0 16px rgba(232, 209, 90, 0.45);
+}
 
 .again {
   margin-top: 26px;
@@ -445,8 +457,6 @@ body.thinking .sigil .core   { animation-duration: 0.7s; }
 .seen.on { display: block; }
 .seen b { color: var(--sign); font-weight: normal; }
 
-body.marked .sigil .core circle:last-child { fill: var(--sign); }
-body.marked .sigil .ring-a { stroke-opacity: 0.7; }
 
 /* ---------- hunger ---------- */
 
@@ -476,14 +486,16 @@ body.marked .sigil .ring-a { stroke-opacity: 0.7; }
 
 .spread-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
   gap: 1px;
-  background: var(--faint);
-  border: 1px solid var(--faint);
   margin: 22px 0;
 }
 
-.spread-grid div { background: var(--void); padding: 20px 18px; }
+.spread-grid > div {
+  background: var(--void);
+  box-shadow: 0 0 0 1px var(--faint);
+  padding: 20px 18px;
+}
 .spread-grid .k {
   font-size: 9px;
   letter-spacing: 0.26em;
@@ -563,8 +575,8 @@ footer .say { color: #5a5750; letter-spacing: 0.06em; text-transform: none; font
 
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior: auto; }
-  body::before,
-  .sigil .ring-a, .sigil .ring-b, .sigil .ring-c, .sigil .core { animation: none; }
+  body::before { animation: none; }
+  .sigil { filter: none; transition: none; }
   #answer-block.on { animation: none; }
   .answer .caret { animation: none; }
   #grain { display: none; }

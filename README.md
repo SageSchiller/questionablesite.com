@@ -23,12 +23,17 @@ analytics, third-party scripts, or tracking.
 
 ## The corpus
 
-80 answers in `ANSWERS` in `oracle.js`. **House rule for adding more:
+155 answers in `ANSWERS` in `oracle.js`. **House rule for adding more:
 surreal, never actionable.** The joke is bad advice, and it only stays
 funny while it is obviously unfollowable. If a line could plausibly be
 acted on by someone having a bad night, it does not go in. Nothing about
 medication, money, self-harm, or anyone's safety. Ominous is the goal;
 harmful is not.
+
+The later additions lean on being counted, being seen, and the sense that
+it knows something it is not leading with. Keep new ones in that register.
+Vary the length: the corpus works because blunt three-word answers sit next
+to long ones, and a run of same-shaped lines reads as a template.
 
 Each reading also randomises `consulted` (12), `certainty` (12), a glyph
 run, a latency (sometimes negative, sometimes "never"), and a depth. That
@@ -37,11 +42,20 @@ cookie.
 
 ## The ritual
 
-Submitting walks a random subset of `RITUAL`, always keeping the first and
-last line, so the sequence differs every time but still opens on "question
-received" and closes on "answer located". Lines mentioning declines or
-failure render in the wound colour. The sigil spins up while `body` carries
-`.thinking`, then the answer types out in the serif.
+`buildRitual()` draws from four pools rather than one fixed list:
+`RITUAL_OPEN` (7), `RITUAL_MID` (43, drawn without replacement and
+shuffled, 3 to 7 of them), `RITUAL_RARE` (8, roughly a 1-in-5 chance of
+one working its way in), and `RITUAL_CLOSE` (7). Sequences run 5 to 10
+steps. Over 4000 generated runs, no two were identical.
+
+Pacing is uneven on purpose: most steps land in 190 to 590ms, but about
+one in seven takes 900 to 1800ms, so it occasionally appears to labour
+over something. `isOminous()` decides which lines render in the wound
+colour, matched on substrings in `RITUAL_OMINOUS`; add to that list when
+you add lines that should read as wrong.
+
+The Sign spins up while `body` carries `.thinking`, then the answer types
+out in the serif.
 
 ## The frame
 
@@ -56,8 +70,9 @@ is the whole effect. Anything that explains the wanting kills it.
 Chambers is public domain, but nothing here quotes him. The register is
 borrowed; the words are original. Keep it that way.
 
-- The sigil is the Sign. Once a visitor has asked, `#seen` states that they
-  have seen it and it cannot be returned, then never mentions it again.
+- The sigil is the Sign, drawn in canvas by `sign.js`. Once a visitor has
+  asked, `#seen` states that they have seen it and it cannot be returned,
+  then never mentions it again.
 - `HUNGER` lines surface after the second question and escalate.
 - At `MARK_AT` (7 asks) the visitor is "marked": `body.marked` brightens
   the sigil core to the sign yellow, and the hunger starts pointing at the
@@ -113,6 +128,38 @@ The single footer line is the entire disclaimer and it stays (see below).
 Resist adding explanation anywhere else. The provenance page is where
 questions about the site get answered, and it answers them by deepening
 them.
+
+## The Sign (`sign.js`)
+
+Canvas, not SVG. CSS animation is too well behaved: it eases, it loops, it
+resolves. The effect here depends on motion that is subtly wrong, and every
+irregularity is meant to read as intent rather than as noise.
+
+- **Rings turn at incommensurate rates** (0.000045, 0.000071, 0.000029,
+  0.000113) so the figure never returns to a pose it has already held.
+  Rotations are accumulated rather than derived from the clock, so a
+  direction reversal does not snap it to a new position.
+- **The two triangles are never equilateral.** Each vertex drifts on its
+  own layered sines, so they are always slightly wrong and never settle.
+- **The glyph ring is tilted**, so the far side reads as behind. Glyphs are
+  only ever swapped while at the back, which means you never catch one
+  changing, you only notice later that it has.
+- **The pupil follows the cursor** with heavy lag, and fixes dead on you
+  while a question is being answered.
+- **Breathing is layered sines with periods that do not divide evenly**, so
+  it never settles into a rhythm you can anticipate.
+
+Rare events fire every 6.5 to 19.5 seconds, more often once marked:
+`blink` (collapses to a line for 130ms), `saccade` (snaps to look at
+nothing, 220ms), `past` (focuses slightly behind you, up to 1.8s),
+`reverse` (instant direction flip, no easing), `stall` (stops, as if
+listening), `flash` (one bright frame, 55ms), and `twin` (a second pupil
+elsewhere in the ring, marked visitors only).
+
+Most of these are deliberately too brief to be sure you saw. If you are
+testing and conclude the events are broken, note that four of the seven do
+not change total brightness at all, so a pixel-sum metric cannot see them.
+Shorten the scheduler temporarily instead.
 
 ## Design notes
 
