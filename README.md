@@ -40,6 +40,47 @@ run, a latency (sometimes negative, sometimes "never"), and a depth. That
 metadata is what sells the answer as machine output rather than a fortune
 cookie.
 
+## Form matching
+
+Answers are routed to match the **grammatical shape** of the question. The
+question is never read for meaning, never stored, and never echoed back:
+it selects a bucket by its opening words and is then discarded. There is
+deliberately no ELIZA-style splicing of user text into answers, because a
+bad extraction reads as broken in a way a non-sequitur never does.
+
+**The rule: fit the grammar, never fit the sense.** "Sell the house. Keep
+the door." is a perfect grammatical answer to "should I sell my house?" and
+still transparently absurd. That is the target. An answer that reads as
+genuinely plausible counsel on money, health, or relationships is a bug,
+because the obvious wrongness is what keeps the footer line honest.
+
+`questionForm()` returns one of: `SHOULD`, `HOWTO`, `YESNO`, `WHY`,
+`WHATIF`, `WHICH`, `WHEN`, `WHO`, `WHERE`, `QTY`, `OPEN`. `FORM_MAP` maps
+each to answer buckets. The main corpus is auto-classified at load into
+`imp` / `decl` / `yn` by opening word, so adding an answer to `ANSWERS`
+requires no tagging. The four narrow pools (`ANSWERS_WHEN`, `ANSWERS_WHO`,
+`ANSWERS_WHERE`, `ANSWERS_QTY`, 15 each) exist because the main corpus
+answers "when" and "who" not at all.
+
+Three distinctions that matter, each of which produced a visible bug before
+it was fixed:
+
+- **`SHOULD` and `HOWTO` are separate.** "Should I go?" takes a yes/no.
+  "How do I tell them?" does not, and merging them gave "How do I tell
+  them?" / "Yes. But not to the question you asked."
+- **Yes/no answers are not in the `decl` bucket.** Only `YESNO` draws from
+  both. Otherwise "What happens if I do nothing?" answers "Yes, but slower."
+- **`pickAnswer()` refuses an immediate repeat.** The narrow pools are
+  small enough that back-to-back duplicates were common and read as a bug
+  rather than as fate.
+
+Unrecognised questions fall through to `OPEN`, which is the whole corpus,
+so it always answers. Any bucket that would come out under 8 entries widens
+to the full imperative plus declarative set rather than repeating itself.
+
+The archive passes its own question stem through the same routing, so
+archived pairs are as coherent as live ones.
+
 ## The ritual
 
 `buildRitual()` draws from four pools rather than one fixed list:

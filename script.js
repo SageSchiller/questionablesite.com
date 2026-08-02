@@ -142,7 +142,9 @@
       ritual.classList.add("on");
       document.body.classList.add("thinking");
 
-      const reading = makeReading();
+      // The question picks a bucket by its grammatical form and is then
+      // discarded. Nothing from it reaches the answer.
+      const reading = makeReading(q);
       askCount(true);
 
       const steps = buildRitual();
@@ -254,18 +256,22 @@
     "what happens if i", "why does it keep", "am i the only one who",
     "is there a way to", "how long until", "did i imagine", "should i have said",
     "what do i do about", "can it still be", "is it normal that",
+    "who else knows about", "where did it go after", "how many times did",
   ];
 
   function renderArchive(feed) {
     feed.innerHTML = "";
     for (let i = 0; i < 14; i++) {
-      const r = makeReading();
+      // Pass the stem so archived answers match the shape of their own
+      // question, the same way a live one does.
+      const stem = pick(ASKED);
+      const r = makeReading(stem);
       const e = document.createElement("div");
       e.className = "entry";
 
       const q = document.createElement("div");
       q.className = "q";
-      q.textContent = "> " + pick(ASKED) + " ";
+      q.textContent = "> " + stem + " ";
 
       // The redaction gives way if you push at it. What is underneath is
       // worse than the block was.

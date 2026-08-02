@@ -167,6 +167,160 @@ const ANSWERS = [
   "Take the smaller room. The smaller room is where things get said.",
 ];
 
+/* ---------------- form-specific pools ---------------- */
+// The main corpus is almost all imperatives and declaratives, which answer
+// "should I" and "is it" well and answer "when" or "who" not at all. These
+// four pools fill those gaps. Same house rule: fit the grammar, never the
+// sense.
+
+const ANSWERS_WHEN = [
+  "Thursday. Not this Thursday.",
+  "After the second time it happens. Not the first. The first does not count.",
+  "Sooner than is convenient and later than is useful.",
+  "It already has. You will be told in about a month.",
+  "Nine days. We are not able to say from when.",
+  "When the noise stops. You have not noticed the noise yet.",
+  "Not while anyone is watching, which narrows it less than you would hope.",
+  "Between four and five in the morning, which is when most of this gets decided.",
+  "The third time you are asked. Say nothing the first two times.",
+  "It is overdue. It has been overdue for most of the time you have known about it.",
+  "In the autumn. Not the coming one.",
+  "Immediately, or in eleven years. There is nothing available in between.",
+  "After you stop checking.",
+  "The day after you give up on it. Not before. It requires the giving up.",
+  "Never, in the sense you mean. Frequently, in the other sense.",
+];
+
+const ANSWERS_WHO = [
+  "The one who has not spoken yet.",
+  "Nobody you have met. This will change shortly.",
+  "The second person you thought of. The first is a decoy you built.",
+  "Someone who was in the room and has since been left out of the account.",
+  "You, but not for a while yet.",
+  "The one who keeps offering. Yes. That one. It is not a coincidence.",
+  "A person who is currently asleep.",
+  "Whoever is least surprised when it comes out.",
+  "The quiet one. It is always the quiet one and everyone is tired of that being true.",
+  "Nobody did it. This is somehow worse and you will have to sit with it.",
+  "Someone who has already been asked, and who said no.",
+  "Not the one you are protecting. The other one.",
+  "The one who told you not to ask.",
+  "A name you will recognise and will not immediately place.",
+  "Everyone, slightly. This is the answer more often than people care for.",
+];
+
+const ANSWERS_WHERE = [
+  "Two streets further than you think.",
+  "Where you already looked. Look again. It is different now.",
+  "Behind something you moved recently.",
+  "Not in the building. Near it.",
+  "The room you walk through and never stop in.",
+  "Somewhere north. The rest of the address is unavailable.",
+  "Under. Not inside. Under.",
+  "Where it was left, which is not where it was put.",
+  "The last place, which is why nobody has checked it.",
+  "Closer than is comfortable and further than is useful.",
+  "In the part of the house that is colder for no reason.",
+  "It is not anywhere. It is between two anywheres and it is fine there.",
+  "Where you were standing when you first thought about it.",
+  "Downstairs. There is no downstairs. Go anyway.",
+  "The address is correct. The building is not.",
+];
+
+const ANSWERS_QTY = [
+  "Four. It has always been four. It will not be four tomorrow.",
+  "More than you have. Fewer than you were told.",
+  "Eleven. This number recurs here and nobody has explained it.",
+  "One, and then all of them at once.",
+  "Enough, and not enough. Both are true and the difference is timing.",
+  "Nine hundred. Do not attempt to verify this.",
+  "Half. Then half of that. Continue until it stops mattering.",
+  "Zero. The counting was the problem, as it usually is.",
+  "Three, but only two will be visible.",
+  "As many as are asked for, which is never the number needed.",
+  "Somewhere between two and a great deal more than two.",
+  "Seven. We are confident. We have been confident before.",
+  "It is not a number. It has been reported as a number for convenience.",
+  "One fewer than last time. This will continue.",
+  "Too many to count and few enough to name.",
+];
+
+/* ---------------- form matching ---------------- */
+// Answers are routed by grammatical shape only. The question is never read
+// for meaning, never stored, and never echoed back. It selects a bucket and
+// is then discarded.
+
+// Openers that mark an answer as a statement rather than an instruction.
+const DECL_OPENER = /^(the|you|it|there|they|this|that|he|she|we|your|his|her|its|everyone|everybody|someone|somebody|something|nothing|nobody|no one|most|several|both|every|all|any|two|three|one|four|whatever|correct|consider|answer withheld)\b/i;
+
+let BY_FORM = null;
+
+function classifyCorpus() {
+  if (BY_FORM) return BY_FORM;
+  BY_FORM = {
+    imp: [], decl: [], yn: [],
+    when: ANSWERS_WHEN, who: ANSWERS_WHO,
+    where: ANSWERS_WHERE, qty: ANSWERS_QTY,
+  };
+  for (let i = 0; i < ANSWERS.length; i++) {
+    const a = ANSWERS[i];
+    // Yes/no answers stay out of the declarative bucket. "Yes, but slower"
+    // is a fine reply to "is it too late" and a broken one to "what happens
+    // if I do nothing", and only the YESNO form pulls from both.
+    if (/^(yes|no)\b/i.test(a)) BY_FORM.yn.push(a);
+    else if (DECL_OPENER.test(a)) BY_FORM.decl.push(a);
+    else BY_FORM.imp.push(a);
+  }
+  return BY_FORM;
+}
+
+// Order matters: the narrow "how long" style openers have to be tested
+// before the general "how do I" ones, and before the yes/no auxiliaries.
+function questionForm(q) {
+  const s = String(q || "").trim().toLowerCase().replace(/^[^a-z]+/, "");
+  if (!s) return "OPEN";
+
+  if (/^(how many|how much)\b/.test(s)) return "QTY";
+  if (/^(when|what time|how long|how soon|how often|until when)\b/.test(s)) return "WHEN";
+  if (/^(who|whose|whom)\b/.test(s)) return "WHO";
+  if (/^where\b/.test(s)) return "WHERE";
+  if (/^why\b/.test(s)) return "WHY";
+  if (/^(what if|what happens if|what would happen)\b/.test(s)) return "WHATIF";
+  if (/^which\b/.test(s)) return "WHICH";
+  // "should I" takes a yes/no. "how do I" does not, and lumping the two
+  // together yields "How do I tell them?" / "Yes. But not to the question
+  // you asked."
+  if (/^(should|shall|ought)\b/.test(s)) return "SHOULD";
+  if (/^how (do|can|should|would|might) /.test(s)) return "HOWTO";
+  if (/^what (do|should|can|must) (i|we|you)\b/.test(s)) return "HOWTO";
+  if (/^(is|are|was|were|will|would|can|could|do|does|did|am|have|has|had|must|might|may)\b/.test(s)) return "YESNO";
+  return "OPEN";
+}
+
+const FORM_MAP = {
+  SHOULD: ["imp", "yn"],
+  HOWTO:  ["imp"],
+  YESNO:  ["yn", "decl"],
+  WHY:    ["decl"],
+  WHATIF: ["decl"],
+  WHICH:  ["imp", "decl"],
+  WHEN:   ["when"],
+  WHO:    ["who"],
+  WHERE:  ["where"],
+  QTY:    ["qty"],
+  OPEN:   ["imp", "decl", "yn"],
+};
+
+function answersFor(question) {
+  const by = classifyCorpus();
+  const buckets = FORM_MAP[questionForm(question)] || FORM_MAP.OPEN;
+  let pool = [];
+  for (let i = 0; i < buckets.length; i++) pool = pool.concat(by[buckets[i]] || []);
+  // A thin bucket would make repeats obvious. Widen rather than repeat.
+  if (pool.length < 8) pool = by.imp.concat(by.decl);
+  return pool;
+}
+
 const CONSULTED = [
   "the index",
   "an older checkpoint",
@@ -403,10 +557,24 @@ function fakeDepth() {
   return String(Math.floor(Math.random() * 900) + 3);
 }
 
-function makeReading() {
+// The narrow pools (when/who/where/qty) are small enough that a back to
+// back repeat is likely and reads as a bug rather than as fate.
+let lastAnswer = null;
+function pickAnswer(pool) {
+  if (!pool.length) return "";
+  if (pool.length < 2) return pool[0];
+  let a = pick(pool);
+  for (let guard = 0; a === lastAnswer && guard < 8; guard++) a = pick(pool);
+  lastAnswer = a;
+  return a;
+}
+
+// The question, when given, only ever selects a bucket. It is not stored,
+// not echoed, and not inspected for anything but its opening words.
+function makeReading(question) {
   const [label, cls] = pick(CERTAINTY);
   return {
-    answer: pick(ANSWERS),
+    answer: pickAnswer(question ? answersFor(question) : ANSWERS),
     consulted: pick(CONSULTED),
     certainty: label,
     certaintyClass: cls,
