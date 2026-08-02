@@ -1,3 +1,8 @@
+// The address the site propagates by. Everything that hands out a link
+// uses this rather than location, so a preview hostname or a local server
+// never gets spread by mistake. Change it here if the domain ever moves.
+const CANONICAL = "https://questionablesite.com/";
+
 // questionablesite :: the corpus.
 //
 // Every answer is drawn at random and has nothing to do with the question.

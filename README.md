@@ -181,6 +181,24 @@ one too:
   tries the async clipboard, falls back to `execCommand`, and if both
   refuse it prints the URL to copy by hand, so the button is never dead.
 
+  **The link is pinned, not derived.** `CANONICAL` at the top of
+  `oracle.js` is the single source, and all three emission paths use it.
+  It used to be built from `location`, which is correct on the real
+  domain and wrong everywhere else: Cloudflare Pages keeps the
+  `*.pages.dev` hostname live alongside the custom domain, so anyone who
+  arrived there would have copied and spread the preview URL. Localhost
+  did the same during testing. **If the domain ever moves, change
+  `CANONICAL` and the `<link rel="canonical">` tags together.**
+
+## Link previews
+
+Every page except `404.html` carries `<link rel="canonical">` plus Open
+Graph and `twitter:card` tags, so a pasted link renders as something
+deliberate rather than a bare URL. This matters more here than on a normal
+site: the whole premise is that it gets passed around, and a broken
+preview is a broken premise. The canonical tags also stop the `pages.dev`
+hostname competing with the real domain if both get indexed.
+
 ## Local preview, and the blank-page trap
 
 These are plain static files with no build step, but the pages still need

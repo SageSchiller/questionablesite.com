@@ -486,7 +486,12 @@
     const btn = document.getElementById("carry");
     if (!btn) return;
     const out = document.getElementById("carry-out");
-    const url = location.origin + location.pathname.replace(/[^/]*$/, "");
+
+    // Pinned, not derived from location. Cloudflare Pages keeps the
+    // *.pages.dev hostname live alongside the custom domain, and anyone
+    // who arrived on that one would otherwise copy and propagate it.
+    // Localhost would do the same during testing.
+    const url = CANONICAL;
 
     let carried = 0;
 
