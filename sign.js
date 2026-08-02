@@ -59,6 +59,21 @@
   resize();
   window.addEventListener("resize", resize);
 
+  // Being touched is the one thing that overrides whatever it was doing.
+  // It takes priority over any event in flight, and it always resolves by
+  // looking straight at you.
+  canvas.addEventListener("pointerdown", () => {
+    if (reduced) return;
+    const now = performance.now();
+    ev = { type: "touch", until: now + 1500, t0: now };
+    // Every glyph on the ring resamples at once, so the ring you were
+    // looking at is not the ring that comes back.
+    for (let i = 0; i < RING_N; i++) {
+      ring[i] = GLYPHS[(Math.random() * GLYPHS.length) | 0];
+    }
+    scheduleEvent(now);
+  });
+
   window.addEventListener("pointermove", (e) => {
     const r = canvas.getBoundingClientRect();
     const cx = r.left + r.width / 2;
@@ -160,7 +175,11 @@
       if (ev && now > ev.until) ev = null;
 
       const stalled = now < stallUntil;
-      const speed = thinking ? 5.2 : 1;
+      let speed = thinking ? 5.2 : 1;
+      // A touch spins it up hard and lets it wind back down.
+      if (ev && ev.type === "touch") {
+        speed = Math.max(speed, 1 + (1 - (now - ev.t0) / 1500) * 7);
+      }
       if (!stalled) {
         // Incommensurate ratios: the figure never returns to a pose it has
         // already held.
@@ -183,7 +202,11 @@
     let tx = pointer.x, ty = pointer.y;
     if (ev && (ev.type === "saccade" || ev.type === "past")) { tx = ev.bx; ty = ev.by; }
     if (thinking) { tx = 0; ty = 0; }          // during a question it fixes on you
-    const ease = thinking ? 0.14 : (ev && ev.type === "saccade" ? 0.5 : 0.045);
+    if (ev && ev.type === "touch") { tx = 0; ty = 0; }   // and when touched
+    const ease = thinking ? 0.14
+      : (ev && ev.type === "touch") ? 0.22
+      : (ev && ev.type === "saccade") ? 0.5
+      : 0.045;
     pupil.x += (tx - pupil.x) * ease;
     pupil.y += (ty - pupil.y) * ease;
 
@@ -265,8 +288,35 @@
     ctx.arc(CX, CY, irisR, 0, Math.PI * 2);
     ctx.stroke();
 
+    // --- shockwave, when it has just been touched ---
+    if (ev && ev.type === "touch") {
+      const p = (now - ev.t0) / 1500;
+      for (let k = 0; k < 2; k++) {
+        const kp = p - k * 0.14;
+        if (kp <= 0 || kp >= 1) continue;
+        const a = (1 - kp) * (1 - kp) * 0.55;
+        ctx.strokeStyle = `rgba(${SIGN}, ${a})`;
+        ctx.lineWidth = 2.2 * (1 - kp) + 0.4;
+        ctx.beginPath();
+        ctx.arc(CX, CY, 18 + kp * 118, 0, Math.PI * 2);
+        ctx.stroke();
+      }
+    }
+
     // --- pupil ---
-    const dilate = thinking ? 1.55 : 1 + breath * 0.16;
+    let dilate = thinking ? 1.55 : 1 + breath * 0.16;
+
+    // A touched pupil constricts hard, overshoots wide, then settles. This
+    // is the whole reaction: everything else is dressing on it.
+    if (ev && ev.type === "touch") {
+      const p = (now - ev.t0) / 1500;
+      let k;
+      if (p < 0.10)      k = 1 - (p / 0.10) * 0.72;              // snap shut
+      else if (p < 0.42) k = 0.28 + ((p - 0.10) / 0.32) * 1.62;  // blow open
+      else               k = 1.90 - ((p - 0.42) / 0.58) * 0.90;  // settle
+      dilate *= k;
+    }
+
     const pr = (marked ? 7.4 : 6.2) * dilate;
     const px = CX + pupil.x * 11;
     const py = CY + pupil.y * 11;

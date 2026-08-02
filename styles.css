@@ -126,6 +126,7 @@ hr.rule {
   width: 220px;
   height: 220px;
   display: block;
+  cursor: pointer;
   filter: drop-shadow(0 0 22px rgba(208, 165, 47, 0.10));
   transition: filter 1.2s ease;
 }
@@ -142,6 +143,14 @@ body.marked   .sigil { filter: drop-shadow(0 0 28px rgba(232, 209, 90, 0.20)); }
   color: #e9e3d7;
   margin: 6px 0 10px 0;
   letter-spacing: 0.02em;
+}
+
+/* While the title is holding the true name. Letter-spacing and colour
+   shift so it reads as a different word, not a typo. */
+.ask-title.truename {
+  color: var(--sign);
+  letter-spacing: 0.08em;
+  text-shadow: 0 0 34px rgba(232, 209, 90, 0.4);
 }
 
 .ask-sub {

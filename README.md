@@ -140,6 +140,13 @@ borrowed; the words are original. Keep it that way.
 - The sigil is the Sign, drawn in canvas by `sign.js`. Once a visitor has
   asked, `#seen` states that they have seen it and it cannot be returned,
   then never mentions it again.
+- **The true name.** `TSEQUA TENEBIOLIS` is an exact anagram of
+  "questionablesite": every letter, nothing added, nothing left over.
+  Verify any replacement before using it, because the effect only works if
+  it is really the same letters. "Tsequa" carries the Lovecraft cadence
+  (Tsathoggua, Ithaqua) and "Tenebiolis" the *tenebrae* root. The title
+  rearranges into it on submit, on touching the Sign, and occasionally
+  unprompted, then rearranges back.
 - `HUNGER` lines surface after the second question and escalate.
 - At `MARK_AT` (7 asks) the visitor is "marked": `body.marked` brightens
   the sigil core to the sign yellow, and the hunger starts pointing at the
@@ -247,6 +254,15 @@ irregularity is meant to read as intent rather than as noise.
 - **Breathing is layered sines with periods that do not divide evenly**, so
   it never settles into a rhythm you can anticipate.
 
+**Touching it is the one thing that overrides whatever it was doing.**
+`pointerdown` fires a `touch` event that outranks anything in flight: the
+pupil snaps shut, blows open past its resting size, then settles; two
+shockwave rings travel outward; the rings spin up and wind down; every
+glyph resamples at once, so the ring you were looking at is not the ring
+that comes back. It ends by looking straight at you. This does not
+interfere with the cursor follow, which is continuous ambient motion,
+where the reaction is a discrete event on top of it.
+
 Rare events fire every 6.5 to 19.5 seconds, more often once marked:
 `blink` (collapses to a line for 130ms), `saccade` (snaps to look at
 nothing, 220ms), `past` (focuses slightly behind you, up to 1.8s),
@@ -270,6 +286,12 @@ Shorten the scheduler temporarily instead.
   cycles them at ~14fps. Regenerating noise every frame is pure heat.
 - `[data-corrupt]` headings flicker a character now and then, as if
   something with an intermittent fault is doing the rendering.
+- **Two effects share the title, so they hand off with a lock.**
+  `initCorrupt` caches the original text and restores it after each
+  flicker; the true-name reveal replaces that text for several seconds.
+  Without the `dataset.locked` handshake the corrupt pass overwrites the
+  name mid-reveal and then restores "questionablesite" underneath it.
+  Anything else that writes to the title has to respect the same flag.
 - All of it stops under `prefers-reduced-motion`, including the grain,
   the breathing, the sigil, and the typing.
 

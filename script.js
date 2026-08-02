@@ -75,6 +75,10 @@
       const tick = () => {
         const wait = 2600 + Math.random() * 7000;
         setTimeout(() => {
+          // The true-name reveal owns the text while it runs. Corrupting
+          // here would overwrite it, and restoring afterwards would snap it
+          // back to "questionablesite" mid-reveal.
+          if (el.dataset.locked) { tick(); return; }
           const chars = original.split("");
           const hits = 1 + Math.floor(Math.random() * 2);
           for (let h = 0; h < hits; h++) {
@@ -89,6 +93,78 @@
       };
       tick();
     });
+  }
+
+  /* ---------- the true name ---------- */
+  // TSEQUA TENEBIOLIS is an exact anagram of "questionablesite": every
+  // letter, no additions, nothing left over. The title occasionally
+  // rearranges itself into it and then back.
+  //
+  // This shares the title with initCorrupt, which caches the original text
+  // and restores it after each flicker. Without the dataset.locked handshake
+  // the two overwrite each other and the reveal snaps back mid-scramble.
+
+  const TRUE_NAME = "TSEQUA TENEBIOLIS";
+
+  function scrambleTo(el, target, dur, done) {
+    const GL = "ABCDEFGHIJKLMNOPQRSTUVWXYZ#$%&*+=?<>/\\";
+    const settle = [];
+    for (let i = 0; i < target.length; i++) {
+      // Characters land in a scattered order rather than left to right.
+      settle.push(dur * 0.3 + Math.random() * dur * 0.7);
+    }
+    const t0 = performance.now();
+    (function frame(now) {
+      const t = now - t0;
+      let out = "";
+      for (let i = 0; i < target.length; i++) {
+        const c = target[i];
+        if (c === " ") { out += " "; continue; }
+        out += (t >= settle[i]) ? c : GL[(Math.random() * GL.length) | 0];
+      }
+      el.textContent = out;
+      if (t < dur) requestAnimationFrame(frame);
+      else { el.textContent = target; if (done) done(); }
+    })(t0);
+  }
+
+  function initTrueName() {
+    const el = document.querySelector(".ask-title");
+    if (!el) return;
+    const home = el.textContent;
+    if (reduced) return;
+
+    let busy = false;
+
+    function reveal() {
+      if (busy) return;
+      busy = true;
+      el.dataset.locked = "1";
+      scrambleTo(el, TRUE_NAME, 640, () => {
+        el.classList.add("truename");
+        setTimeout(() => {
+          el.classList.remove("truename");
+          scrambleTo(el, home, 520, () => {
+            delete el.dataset.locked;
+            busy = false;
+          });
+        }, 2300);
+      });
+    }
+
+    const sign = document.getElementById("sign");
+    if (sign) sign.addEventListener("click", reveal);
+
+    const form = document.getElementById("ask-form");
+    if (form) form.addEventListener("submit", () => setTimeout(reveal, 500));
+
+    // And occasionally with no prompting at all.
+    (function idle() {
+      setTimeout(() => {
+        if (!document.hidden && Math.random() < 0.5) reveal();
+        idle();
+      }, 45000 + Math.random() * 55000);
+    })();
   }
 
   /* ---------- the ask ---------- */
@@ -548,6 +624,7 @@
   document.addEventListener("DOMContentLoaded", () => {
     initGrain();
     initCorrupt();
+    initTrueName();
     initMark();
     initAsk();
     initArchive();
