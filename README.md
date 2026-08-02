@@ -23,7 +23,8 @@ analytics, third-party scripts, or tracking.
 
 ## The corpus
 
-155 answers in `ANSWERS` in `oracle.js`. **House rule for adding more:
+303 answers total: 167 in `ANSWERS` plus four form-specific pools of 34.
+**House rule for adding more:
 surreal, never actionable.** The joke is bad advice, and it only stays
 funny while it is obviously unfollowable. If a line could plausibly be
 acted on by someone having a bad night, it does not go in. Nothing about
@@ -59,8 +60,29 @@ because the obvious wrongness is what keeps the footer line honest.
 each to answer buckets. The main corpus is auto-classified at load into
 `imp` / `decl` / `yn` by opening word, so adding an answer to `ANSWERS`
 requires no tagging. The four narrow pools (`ANSWERS_WHEN`, `ANSWERS_WHO`,
-`ANSWERS_WHERE`, `ANSWERS_QTY`, 15 each) exist because the main corpus
+`ANSWERS_WHERE`, `ANSWERS_QTY`, 34 each) exist because the main corpus
 answers "when" and "who" not at all.
+
+### Where to add next
+
+Repetition risk is not uniform, so measure before writing. Chance of a
+visitor seeing any repeated answer within five questions of one form:
+
+| form | pool | repeat by 5 |
+|---|---|---|
+| OPEN | 167 | 6% |
+| YESNO | 96 | 10% |
+| SHOULD | 87 | 11% |
+| WHY / WHATIF | 80 | 12% |
+| HOWTO | 71 | 13% |
+| WHEN / WHO / WHERE / QTY | 34 each | **27%** |
+
+The four narrow pools remain the thinnest by roughly a factor of two, and
+are the right place to spend effort. They are also the forms people ask
+least often, which is why 34 was judged enough for now. `yn` was at one
+point down to four answers, which made a plain verdict almost never appear
+on the two most satisfying question forms; it is now 16 and should not be
+allowed to fall behind again.
 
 Three distinctions that matter, each of which produced a visible bug before
 it was fixed:
