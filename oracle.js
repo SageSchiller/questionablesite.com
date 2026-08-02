@@ -385,6 +385,10 @@ function questionForm(q) {
   if (/^(should|shall|ought)\b/.test(s)) return "SHOULD";
   if (/^how (do|can|should|would|might) /.test(s)) return "HOWTO";
   if (/^what (do|should|can|must) (i|we|you)\b/.test(s)) return "HOWTO";
+  // Any remaining "what" is asking for a thing, not a verdict. Without
+  // this it fell through to OPEN and could answer "What did I agree to?"
+  // with "No."
+  if (/^what\b/.test(s)) return "WHAT";
   if (/^(is|are|was|were|will|would|can|could|do|does|did|am|have|has|had|must|might|may)\b/.test(s)) return "YESNO";
   return "OPEN";
 }
@@ -394,6 +398,7 @@ const FORM_MAP = {
   HOWTO:  ["imp"],
   YESNO:  ["yn", "decl"],
   WHY:    ["decl"],
+  WHAT:   ["decl"],
   WHATIF: ["decl"],
   WHICH:  ["imp", "decl"],
   WHEN:   ["when"],
@@ -467,22 +472,53 @@ const ORIGINS = [
   "It gives a name. The name belongs to someone who died before the hardware existed.",
 ];
 
-// Fragments recovered when a redacted archive question is prodded.
-const FRAGMENTS = [
-  "the noise in the walls",
-  "whether it was already inside",
-  "what exactly i agreed to",
-  "the second signature",
-  "why it knew my name",
-  "if it still counts as consent",
-  "the room i do not remember entering",
-  "what happened to the first one",
-  "whether anyone else can see it",
-  "the part i left out",
-  "how long it had been running",
-  "who else it has told",
-  "the thing under the stairs",
-  "why it stopped asking",
+// Archive entries are written as whole questions and redacted from the
+// third word on, so recovering one always yields a grammatical sentence.
+// An earlier version paired generic openers with generic fragments and
+// produced things like "should i whether anyone else can see it".
+//
+// Keep the range of opening forms wide: the archive routes these through
+// the same answer matching as a live question, so a flat set of openers
+// makes every archived answer the same shape.
+const ARCHIVE_QUESTIONS = [
+  "should i tell him what i saw",
+  "how long until they notice it is gone",
+  "was it my fault that she stopped calling",
+  "how do i tell them i knew the whole time",
+  "what happens if i do not go back",
+  "why does it keep happening in the same room",
+  "am i the only one who hears it at night",
+  "is there a way to take it back",
+  "how long has it been in the house",
+  "did i imagine the second voice",
+  "should i have said something at the time",
+  "what do i do about the smell in the hallway",
+  "can it still be undone after this long",
+  "is it normal that nobody else remembers him",
+  "who else knows what happened that winter",
+  "where did it go after the fire",
+  "how many times did i agree to this",
+  "should i open the letter or burn it",
+  "why did they all leave in the same week",
+  "is he still waiting where i left him",
+  "what if the first answer was the right one",
+  "how do i get it to stop asking",
+  "when does it become too late to say anything",
+  "who was in the photograph before me",
+  "should i go back for the rest of it",
+  "was there ever anyone in the other chair",
+  "how long do i have to keep pretending",
+  "where does it go when i am not looking",
+  "is it following me or is it ahead of me",
+  "what did i agree to on the second page",
+  "why is my name already on the list",
+  "should i answer when it calls back",
+  "how many of them were real",
+  "who told it about me",
+  "did it start before i got here",
+  "where is the rest of that year",
+  "when will she stop asking about it",
+  "is any of this still mine",
 ];
 
 // It wants to be asked. It wants to be carried. Nobody has established

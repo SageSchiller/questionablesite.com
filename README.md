@@ -55,7 +55,7 @@ still transparently absurd. That is the target. An answer that reads as
 genuinely plausible counsel on money, health, or relationships is a bug,
 because the obvious wrongness is what keeps the footer line honest.
 
-`questionForm()` returns one of: `SHOULD`, `HOWTO`, `YESNO`, `WHY`,
+`questionForm()` returns one of: `SHOULD`, `HOWTO`, `YESNO`, `WHY`, `WHAT`,
 `WHATIF`, `WHICH`, `WHEN`, `WHO`, `WHERE`, `QTY`, `OPEN`. `FORM_MAP` maps
 each to answer buckets. The main corpus is auto-classified at load into
 `imp` / `decl` / `yn` by opening word, so adding an answer to `ANSWERS`
@@ -95,6 +95,10 @@ it was fixed:
 - **`pickAnswer()` refuses an immediate repeat.** The narrow pools are
   small enough that back-to-back duplicates were common and read as a bug
   rather than as fate.
+- **A bare `WHAT` is a content question, not a verdict.** "What do I do
+  about it" is `HOWTO` and "what if" is `WHATIF`, but everything else
+  starting with "what" wants a statement. Without its own form it fell to
+  `OPEN` and answered "What did I agree to?" with "No."
 
 Unrecognised questions fall through to `OPEN`, which is the whole corpus,
 so it always answers. Any bucket that would come out under 8 entries widens
@@ -149,9 +153,22 @@ The three secondary pages were originally static text and read as dead next
 to the oracle. Each one now has a working mechanism, and any new page needs
 one too:
 
-- **Archive** regenerates fourteen entries from the corpus on load and on
-  demand. The redactions are clickable and recover a fragment underneath.
-  The redraw note escalates the more you push it.
+- **Archive** is the consultation log: other people, other afternoons, the
+  same site. Fourteen entries, redrawn on load and on demand. Each question
+  is written whole in `ARCHIVE_QUESTIONS` and redacted from the third word
+  on, so clicking a redaction returns a complete sentence.
+
+  Two things this page got wrong once and must not again. First, the
+  redacted text has to *finish the sentence it is in*: an earlier version
+  paired generic openers with generic fragments and produced "should i
+  whether anyone else can see it". Write whole questions, redact a suffix.
+  Second, the page copy has to admit the redaction fails, because clicking
+  proves it does. The old copy said there was "nothing under the redaction
+  to restore" and then restored something.
+
+  Entries are drawn without replacement, and answers are deduplicated
+  within a render, since fourteen draws from a 34-item pool otherwise
+  repeat on the same screen.
 - **Provenance** lets you interrogate it about its own origin. Claims are
   drawn **without replacement** from `ORIGINS`, because the page states it
   gave eleven different answers on eleven occasions and the button has to

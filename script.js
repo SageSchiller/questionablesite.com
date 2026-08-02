@@ -251,40 +251,49 @@
   // Fabricated on load from the same corpus, so the page is never twice the
   // same and always looks like it has been running without us.
 
-  const ASKED = [
-    "should i", "is it too late to", "was it my fault that", "how do i tell them",
-    "what happens if i", "why does it keep", "am i the only one who",
-    "is there a way to", "how long until", "did i imagine", "should i have said",
-    "what do i do about", "can it still be", "is it normal that",
-    "who else knows about", "where did it go after", "how many times did",
-  ];
-
   function renderArchive(feed) {
     feed.innerHTML = "";
+
+    // Draw without replacement so one screen never shows the same question
+    // twice.
+    const bag = ARCHIVE_QUESTIONS.slice();
+    // The narrow pools are small enough that fourteen draws would otherwise
+    // repeat an answer on the same screen, which reads as a bug.
+    const usedAnswers = new Set();
+
     for (let i = 0; i < 14; i++) {
-      // Pass the stem so archived answers match the shape of their own
-      // question, the same way a live one does.
-      const stem = pick(ASKED);
-      const r = makeReading(stem);
+      if (!bag.length) bag.push.apply(bag, ARCHIVE_QUESTIONS);
+      const question = bag.splice(Math.floor(Math.random() * bag.length), 1)[0];
+
+      // Routing uses the whole question, so the answer matches the form even
+      // while most of the question is still hidden.
+      let r = makeReading(question);
+      for (let t = 0; t < 10 && usedAnswers.has(r.answer); t++) r = makeReading(question);
+      usedAnswers.add(r.answer);
+
+      const words = question.split(" ");
+      const shown = words.slice(0, 2).join(" ");
+      const hidden = words.slice(2).join(" ");
+
       const e = document.createElement("div");
       e.className = "entry";
 
       const q = document.createElement("div");
       q.className = "q";
-      q.textContent = "> " + stem + " ";
+      q.textContent = "> " + shown + " ";
 
-      // The redaction gives way if you push at it. What is underneath is
-      // worse than the block was.
+      // The redaction gives way if you push at it, and what comes back is a
+      // whole sentence rather than a fragment.
       const red = document.createElement("span");
       red.className = "redact";
       red.setAttribute("role", "button");
       red.setAttribute("tabindex", "0");
       red.title = "recover";
-      red.textContent = "█".repeat(6 + Math.floor(Math.random() * 22));
+      red.textContent = "█".repeat(Math.max(6, hidden.length));
       const reveal = () => {
         if (red.classList.contains("open")) return;
         red.classList.add("open");
-        red.textContent = pick(FRAGMENTS);
+        red.textContent = hidden;
         red.removeAttribute("role");
         red.removeAttribute("tabindex");
         red.title = "";
