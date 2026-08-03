@@ -1,9 +1,0 @@
-# security.txt for questionablesite.com (RFC 9116)
-# This is a static site: no backend, no database, no accounts, and no
-# visitor data is collected or stored anywhere but the visitor's own
-# browser. Reports are welcome regardless.
-
-Contact: mailto:info@questionablesite.com
-Expires: 2027-08-01T00:00:00.000Z
-Preferred-Languages: en
-Canonical: https://questionablesite.com/.well-known/security.txt
